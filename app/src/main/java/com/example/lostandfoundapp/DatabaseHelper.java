@@ -5,12 +5,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
 import java.util.ArrayList;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "lost_found.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
 
     private static final String TABLE_NAME = "adverts";
 
@@ -24,6 +25,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COL_CATEGORY = "category";
     private static final String COL_IMAGE_URI = "image_uri";
     private static final String COL_TIMESTAMP = "timestamp";
+    private static final String COL_LATITUDE = "latitude";
+    private static final String COL_LONGITUDE = "longitude";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -42,7 +45,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         COL_LOCATION + " TEXT, " +
                         COL_CATEGORY + " TEXT, " +
                         COL_IMAGE_URI + " TEXT, " +
-                        COL_TIMESTAMP + " TEXT)";
+                        COL_TIMESTAMP + " TEXT, " +
+                        COL_LATITUDE + " REAL, " +
+                        COL_LONGITUDE + " REAL" +
+                        ")";
 
         db.execSQL(createTable);
     }
@@ -66,6 +72,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COL_CATEGORY, advert.getCategory());
         values.put(COL_IMAGE_URI, advert.getImageUri());
         values.put(COL_TIMESTAMP, advert.getTimestamp());
+        values.put(COL_LATITUDE, advert.getLatitude());
+        values.put(COL_LONGITUDE, advert.getLongitude());
 
         long result = db.insert(TABLE_NAME, null, values);
         db.close();
@@ -77,7 +85,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ArrayList<Advert> advertList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " ORDER BY " + COL_ID + " DESC", null);
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM " + TABLE_NAME + " ORDER BY " + COL_ID + " DESC",
+                null
+        );
 
         if (cursor.moveToFirst()) {
             do {
@@ -91,10 +102,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         cursor.getString(cursor.getColumnIndexOrThrow(COL_LOCATION)),
                         cursor.getString(cursor.getColumnIndexOrThrow(COL_CATEGORY)),
                         cursor.getString(cursor.getColumnIndexOrThrow(COL_IMAGE_URI)),
-                        cursor.getString(cursor.getColumnIndexOrThrow(COL_TIMESTAMP))
+                        cursor.getString(cursor.getColumnIndexOrThrow(COL_TIMESTAMP)),
+                        cursor.getDouble(cursor.getColumnIndexOrThrow(COL_LATITUDE)),
+                        cursor.getDouble(cursor.getColumnIndexOrThrow(COL_LONGITUDE))
                 );
 
                 advertList.add(advert);
+
             } while (cursor.moveToNext());
         }
 
@@ -125,10 +139,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         cursor.getString(cursor.getColumnIndexOrThrow(COL_LOCATION)),
                         cursor.getString(cursor.getColumnIndexOrThrow(COL_CATEGORY)),
                         cursor.getString(cursor.getColumnIndexOrThrow(COL_IMAGE_URI)),
-                        cursor.getString(cursor.getColumnIndexOrThrow(COL_TIMESTAMP))
+                        cursor.getString(cursor.getColumnIndexOrThrow(COL_TIMESTAMP)),
+                        cursor.getDouble(cursor.getColumnIndexOrThrow(COL_LATITUDE)),
+                        cursor.getDouble(cursor.getColumnIndexOrThrow(COL_LONGITUDE))
                 );
 
                 advertList.add(advert);
+
             } while (cursor.moveToNext());
         }
 
@@ -159,7 +176,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     cursor.getString(cursor.getColumnIndexOrThrow(COL_LOCATION)),
                     cursor.getString(cursor.getColumnIndexOrThrow(COL_CATEGORY)),
                     cursor.getString(cursor.getColumnIndexOrThrow(COL_IMAGE_URI)),
-                    cursor.getString(cursor.getColumnIndexOrThrow(COL_TIMESTAMP))
+                    cursor.getString(cursor.getColumnIndexOrThrow(COL_TIMESTAMP)),
+                    cursor.getDouble(cursor.getColumnIndexOrThrow(COL_LATITUDE)),
+                    cursor.getDouble(cursor.getColumnIndexOrThrow(COL_LONGITUDE))
             );
         }
 
